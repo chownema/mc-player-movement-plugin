@@ -1,0 +1,5 @@
+name: Doublejump
+version: ${project.version}
+main: de.gerolmed.doublejump.Doublejump
+authors: [Gerolmed]
+description: Provides a simple doublejump system
