@@ -180,6 +180,22 @@ public final class Doublejump extends JavaPlugin implements Listener {
     }
 
     /**
+     * Called when player switches his game mode
+     *
+     * @param event the event
+     */
+    @EventHandler
+    public void switchGameMode(PlayerGameModeChangeEvent event) {
+        Player player = event.getPlayer();
+        if(!player.hasPermission("doublejump.jump") ||
+                event.getNewGameMode() == GameMode.CREATIVE ||
+                event.getNewGameMode() == GameMode.SPECTATOR)
+            return;
+        player.setAllowFlight(true);
+        player.setFlying(false);
+    }
+
+    /**
      * Checks a material if it is a block the players double jump should not be refreshed on
      *
      * @param type Material to check
