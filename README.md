@@ -3,4 +3,4 @@ This is a simple one class java maven spigot plugin. The plugin allows double ju
 
 This project was done in less than 1 hour!
 
-Download and mor information on spigot: https://www.spigotmc.org/resources/double-jump.66749/
+Download and more information on spigot: https://www.spigotmc.org/resources/double-jump.66749/
