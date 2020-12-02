@@ -28,7 +28,8 @@ public final class Doublejump extends JavaPlugin implements Listener {
     /**
      * A list of all players that have double jumped
      */
-    private final ArrayList<UUID> jumpers;
+    // private final ArrayList<UUID> jumpers;
+    private final ArrayList<Player> movers;
 
     /**
      * Creates a new instance of this plugin.
@@ -36,7 +37,8 @@ public final class Doublejump extends JavaPlugin implements Listener {
      */
     public Doublejump() {
         this.LOGGER = Bukkit.getLogger();
-        this.jumpers = new ArrayList<>();
+        // this.jumpers = new ArrayList<>();
+        this.movers = new ArrayList<>();
     }
 
     /**
@@ -117,8 +119,10 @@ public final class Doublejump extends JavaPlugin implements Listener {
     public void attemptDoubleJump(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
 
+
         //Don't double jump in these cases
-        if(jumpers.contains(player.getUniqueId()) ||
+        if(
+               //  jumpers.contains(player.getUniqueId()) ||
                 !player.hasPermission("doublejump.jump") ||
                 !event.isFlying() ||
                 player.getGameMode() == GameMode.CREATIVE ||
@@ -129,13 +133,16 @@ public final class Doublejump extends JavaPlugin implements Listener {
         player.setAllowFlight(false);
         player.setFlying(false);//Disable to prevent wobbling
 
-        Vector direction = player.getEyeLocation().getDirection();
-        if(direction.getY() <= 0)
-            direction.setY(0.6);
+        // Vector direction = player.getEyeLocation().getDirection();
+        // if(direction.getY() <= 0)
+        //     direction.setY(2.0);
+
+        Vector direction = player.getLocation().getDirection();
 
         player.setVelocity(direction);
-        jumpers.add(player.getUniqueId());
-        player.getLocation().getWorld().playEffect(player.getLocation(), Effect.EXPLOSION_LARGE,0, 20);
+        movers.add(player);
+        // jumpers.add(player.getUniqueId());
+        // player.getLocation().getWorld().playEffect(player.getLocation(), Effect.EXPLOSION_LARGE,0, 20);
         //TODO Rework effect and add sound
     }
 
@@ -148,8 +155,8 @@ public final class Doublejump extends JavaPlugin implements Listener {
     public void damageFall(EntityDamageEvent event) {
         if(!(event.getEntity() instanceof Player))
             return;
-        if(!jumpers.contains(event.getEntity().getUniqueId()) || event.getCause() != EntityDamageEvent.DamageCause.FALL)
-            return;
+        // if(!jumpers.contains(event.getEntity().getUniqueId()) || event.getCause() != EntityDamageEvent.DamageCause.FALL)
+            // return;
         event.setCancelled(true);
     }
 
@@ -162,8 +169,15 @@ public final class Doublejump extends JavaPlugin implements Listener {
     public void refresh(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if(!jumpers.contains(player.getUniqueId()))
+        movers.add(player);
+        if (movers.stream()
+                .filter(mover -> player.getUniqueId().equals(mover.getUniqueId()))
+                .findAny()
+                .orElse(null) == null) {
             return;
+        }
+        // if(!jumpers.contains(player.getUniqueId()))
+        //     return;
 
         Location belowPlayer = player.getLocation().subtract(0,0.1,0);
         Block block = belowPlayer.getBlock();
@@ -176,7 +190,11 @@ public final class Doublejump extends JavaPlugin implements Listener {
         if(isNonGroundMaterial(block.getType()))
             return;
         player.setAllowFlight(true);
-        jumpers.remove(player.getUniqueId());
+        // jumpers.remove(player.getUniqueId());
+        movers.remove(
+                movers.stream()
+                .filter(mover -> player.getUniqueId().equals(mover.getUniqueId()))
+                );
     }
 
     /**
